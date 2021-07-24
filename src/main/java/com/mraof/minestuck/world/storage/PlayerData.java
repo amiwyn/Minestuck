@@ -79,6 +79,7 @@ public final class PlayerData
 	private boolean effectToggle;
 	
 	private boolean hasLoggedIn;
+	private boolean hasKernelSprite;
 	
 	PlayerData(PlayerSavedData savedData, PlayerIdentifier player)
 	{
@@ -87,6 +88,7 @@ public final class PlayerData
 		echeladder = new Echeladder(savedData, player);
 		gristCache = new ImmutableGristSet(GristTypes.BUILD, 20);
 		hasLoggedIn = false;
+		hasKernelSprite = false;
 	}
 	
 	PlayerData(PlayerSavedData savedData, CompoundNBT nbt)
@@ -120,6 +122,8 @@ public final class PlayerData
 		title = Title.tryRead(nbt, "title");
 		effectToggle = nbt.getBoolean("effect_toggle");
 		
+		hasKernelSprite = nbt.getBoolean("has_kernelsprite");
+		
 		hasLoggedIn = true;
 	}
 	
@@ -149,6 +153,8 @@ public final class PlayerData
 		if(title != null)
 			title.write(nbt, "title");
 		nbt.putBoolean("effect_toggle", effectToggle);
+		
+		nbt.putBoolean("has_kernelsprite", hasKernelSprite);
 		
 		return nbt;
 	}
@@ -321,6 +327,17 @@ public final class PlayerData
 			effectToggle = toggle;
 			markDirty();
 		}
+	}
+	
+	public boolean hasKernelSprite()
+	{
+		return hasKernelSprite;
+	}
+	
+	public void setHasKernelSprite(boolean hasKernelSprite)
+	{
+		this.hasKernelSprite = hasKernelSprite;
+		markDirty();
 	}
 	
 	private void tryGiveStartingModus(ServerPlayerEntity player)

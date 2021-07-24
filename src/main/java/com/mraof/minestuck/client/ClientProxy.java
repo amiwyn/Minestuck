@@ -40,7 +40,8 @@ public class ClientProxy
 		registerRenderers();
 		
 		MSScreenFactories.registerScreenFactories();
-
+		
+		RenderingRegistry.registerEntityRenderingHandler(MSEntityTypes.KERNELSPRITE, KernelspriteRenderer::new);
 		RenderingRegistry.registerEntityRenderingHandler(MSEntityTypes.FROG, FrogRenderer::new);
 		RenderingRegistry.registerEntityRenderingHandler(MSEntityTypes.HOLOGRAM, HologramRenderer::new);
 		RenderingRegistry.registerEntityRenderingHandler(MSEntityTypes.NAKAGATOR, manager -> new SimpleTexturedEntityRenderer<>(manager, new NakagatorModel<>(), 0.5F));
