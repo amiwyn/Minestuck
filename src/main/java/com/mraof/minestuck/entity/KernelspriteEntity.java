@@ -18,6 +18,8 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.pathfinding.FlyingPathNavigator;
 import net.minecraft.pathfinding.PathNavigator;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -65,12 +67,13 @@ public class KernelspriteEntity extends CreatureEntity
 		this.ownerID = UUID.fromString(compound.getString("Owner"));
 		
 		BlockPos homePos = NBTUtil.readBlockPos(compound.getCompound("HomePosition"));
-		ServerPlayerEntity player = (ServerPlayerEntity)this.world.getPlayerByUuid(this.ownerID);
-		if (player != null && SburbHandler.hasEntered(player)) {
+		ServerPlayerEntity player = (ServerPlayerEntity) this.world.getPlayerByUuid(this.ownerID);
+		if(player != null && SburbHandler.hasEntered(player))
+		{
 			homePos = NBTUtil.readBlockPos(compound.getCompound("HomePosition"));
 		}
 		
-		setHomePosAndDistance(NBTUtil.readBlockPos(compound.getCompound("HomePosition")), MinestuckConfig.SERVER.artifactRange.get());
+		setHomePosAndDistance(NBTUtil.readBlockPos(compound.getCompound("HomePosition")), MinestuckConfig.SERVER.artifactRange.get()); //travels as far as your entry platform is wide
 		this.homePos = homePos;
 	}
 	
@@ -85,11 +88,17 @@ public class KernelspriteEntity extends CreatureEntity
 		return this.dataManager.get(COLOR);
 	}
 	
-	public void setOwner(PlayerEntity player) {
+	public ServerPlayerEntity getServerPlayerEntityFromUUID()
+	{
+		return this.getServer().getPlayerList().getPlayerByUUID(ownerID);
+	}
+	
+	public void setOwner(PlayerEntity player)
+	{
 		this.ownerID = player.getUniqueID();
 		this.homePos = player.getPosition();
 		setHomePosAndDistance(this.homePos, MinestuckConfig.SERVER.artifactRange.get());
-		int color = ColorHandler.getColorForPlayer((ServerPlayerEntity)player);
+		int color = ColorHandler.getColorForPlayer((ServerPlayerEntity) player);
 		this.dataManager.set(COLOR, color);
 	}
 	
@@ -100,6 +109,7 @@ public class KernelspriteEntity extends CreatureEntity
 	
 	protected void registerGoals()
 	{
+		this.goalSelector.addGoal(1, new KernelspriteEntity.HealOwnerGoal());
 		this.goalSelector.addGoal(2, new KernelspriteEntity.WanderGoal());
 		this.goalSelector.addGoal(3, new SwimGoal(this));
 	}
@@ -130,7 +140,8 @@ public class KernelspriteEntity extends CreatureEntity
 		return false;
 	}
 	
-	protected void updateFallState(double y, boolean onGroundIn, BlockState state, BlockPos pos) {
+	protected void updateFallState(double y, boolean onGroundIn, BlockState state, BlockPos pos)
+	{
 	}
 	
 	@Override
@@ -171,6 +182,49 @@ public class KernelspriteEntity extends CreatureEntity
 			Vec3d vec3d = KernelspriteEntity.this.getLook(0.0F);
 			Vec3d vec3d2 = RandomPositionGenerator.findAirTarget(KernelspriteEntity.this, 8, 7, vec3d, ((float) Math.PI / 2F), 2, 1);
 			return vec3d2 != null ? vec3d2 : RandomPositionGenerator.findGroundTarget(KernelspriteEntity.this, 8, 4, -2, vec3d, (double) ((float) Math.PI / 2F));
+		}
+	}
+	
+	class HealOwnerGoal extends Goal
+	{
+		HealOwnerGoal()
+		{
+			this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+			this.setMutexFlags(EnumSet.of(Flag.LOOK));
+		}
+		
+		public boolean shouldExecute()
+		{
+			ServerPlayerEntity ownerPlayer = KernelspriteEntity.this.getServerPlayerEntityFromUUID();
+			if(ownerPlayer != null)
+			{
+				return ownerPlayer.getHealth() / ownerPlayer.getMaxHealth() <= 0.5 && ownerPlayer.getPositionVec().distanceTo(KernelspriteEntity.this.getPositionVec()) <= 32; //checks if players health is at half or less and if the player is nearby
+			}
+			return false;
+		}
+		
+		public boolean shouldContinueExecuting()
+		{
+			ServerPlayerEntity ownerPlayer = KernelspriteEntity.this.getServerPlayerEntityFromUUID();
+			if(ownerPlayer != null)
+			{
+				if(ownerPlayer.getHealth() / ownerPlayer.getMaxHealth() <= 0.5 && ownerPlayer.getPositionVec().squareDistanceTo(KernelspriteEntity.this.getPositionVec()) <= 10)
+				{
+					ownerPlayer.addPotionEffect(new EffectInstance(Effects.INSTANT_HEALTH, 1, 2));
+					return false;
+				}
+			}
+			
+			return !KernelspriteEntity.this.navigator.noPath();
+		}
+		
+		public void startExecuting()
+		{
+			ServerPlayerEntity ownerPlayer = KernelspriteEntity.this.getServerPlayerEntityFromUUID();
+			if(ownerPlayer != null)
+			{
+				KernelspriteEntity.this.navigator.setPath(KernelspriteEntity.this.navigator.getPathToPos(new BlockPos(ownerPlayer.getPositionVec()), 1), 0.8D);
+			}
 		}
 	}
 }
