@@ -120,7 +120,7 @@ public class MSKeyHandler
 					"..."
 				};
 				
-				Minecraft.getInstance().displayGuiScreen(new DialogueScreen(paragraphs, test, options));
+				//Minecraft.getInstance().displayGuiScreen(new DialogueScreen(paragraphs, test, options, color));
 			}
 			
 		}
