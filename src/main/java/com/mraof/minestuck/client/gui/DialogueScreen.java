@@ -20,7 +20,7 @@ public class DialogueScreen extends Screen
 	
 	private static final int RESPONSE_TEXT_OFFSET = 40;
 	
-	private String[] dialogueText;
+	private String[] dialogueTexts;
 	private String[] responseOptions;
 	private ResourceLocation portrait;
 	private String renderedText;
@@ -32,16 +32,14 @@ public class DialogueScreen extends Screen
 	
 	public enum DialogueBoxType
 	{
-		STANDARD(new ResourceLocation("minestuck", "textures/gui/dialogue.png"), false),
-		DARK(new ResourceLocation("minestuck", "textures/gui/dialogue_dark.png"), false); //same as dialogue but better fitted for light colored texts like iguanas
+		STANDARD(new ResourceLocation("minestuck", "textures/gui/dialogue.png")),
+		DARK(new ResourceLocation("minestuck", "textures/gui/dialogue_dark.png")); //same as dialogue but better fitted for light colored texts like iguanas
 		
 		public final ResourceLocation background;
-		public final boolean animated;
 		
-		DialogueBoxType(ResourceLocation background, boolean animated)
+		DialogueBoxType(ResourceLocation background)
 		{
 			this.background = background;
-			this.animated = animated; //currently no plans for this, but if we wanted to make it so the box has its own animation then this could be used to check for it(feel free to remove)
 		}
 		
 		public final ResourceLocation getTextBackgroundBox()
@@ -50,14 +48,14 @@ public class DialogueScreen extends Screen
 		}
 	}
 	
-	public DialogueScreen(String[] dialogueText, ResourceLocation portrait, String[] responseOptions, int color, DialogueBoxType dialogueBoxType)
+	public DialogueScreen(String[] dialogueTexts, ResourceLocation portrait, String[] responseOptions, int color, DialogueBoxType dialogueBoxType)
 	{
 		super(new TranslationTextComponent(TITLE));
-		this.dialogueText = dialogueText;
+		this.dialogueTexts = dialogueTexts;
 		this.portrait = portrait;
+		this.currentTextIndex = 0;
 		this.responseOptions = responseOptions;
 		this.playerTextColor = color;
-		this.currentTextIndex = 0;
 		this.dialogueBoxType = dialogueBoxType;
 		resetWriter();
 	}
@@ -72,7 +70,7 @@ public class DialogueScreen extends Screen
 		
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		
-		this.minecraft.getTextureManager().bindTexture(dialogueBoxType.getTextBackgroundBox()); //sets the backdrop for the text, by default it will use gui/dialogue.png
+		this.minecraft.getTextureManager().bindTexture(dialogueBoxType.getTextBackgroundBox());
 		this.blit(xOffset, yOffset, 0, 0, GUI_WIDTH, GUI_HEIGHT);
 		
 		int leftStart = xOffset + PORTRAIT_SIZE + 16;
@@ -87,25 +85,8 @@ public class DialogueScreen extends Screen
 		super.render(mouseX, mouseY, partialTicks);
 	}
 	
-	@Override
-	public void init()
-	{
-		super.init();
-		
-		int xOffset = ((width - GUI_WIDTH) / 2) + PORTRAIT_SIZE + 16 - RESPONSE_TEXT_OFFSET;
-		int yOffset = ((height - GUI_HEIGHT) / 2) + GUI_HEIGHT + 8;
-		
-		for(int i = 0; i < responseOptions.length; i++)
-		{
-			addButton(new DialogueButton(xOffset, yOffset + (10 * i) - 70, GUI_WIDTH, 10, responseOptions[i], btn -> test())); //slightly off in x coords from the speaker dialogue intentionally
-		}
-		
-		this.changeFocus(true);
-	}
-	
-	public void test()
-	{
-	
+	public void test() {
+		close();
 	}
 	
 	@Override
@@ -113,8 +94,8 @@ public class DialogueScreen extends Screen
 	{
 		if(!doneWriting)
 		{
-			String text = dialogueText[currentTextIndex];
-			int amount = Math.min(frame * MinestuckConfig.CLIENT.dialogueSpeed.get(), text.length()); //default dialogue speed is 6
+			String text = dialogueTexts[currentTextIndex];
+			int amount = Math.min(frame * MinestuckConfig.CLIENT.dialogueSpeed.get(), text.length());
 			
 			if(amount == text.length())
 			{
@@ -129,10 +110,20 @@ public class DialogueScreen extends Screen
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int i)
 	{
-		if(keyCode == GLFW.GLFW_KEY_SPACE && !this.doneWriting)
-		{
-			skip();
-			return false;
+		if(keyCode == GLFW.GLFW_KEY_SPACE) {
+			if(!this.doneWriting) {
+				renderedText = dialogueTexts[currentTextIndex];
+				doneWriting = true;
+				return false;
+			}
+			else if(currentTextIndex < dialogueTexts.length - 1) {
+				currentTextIndex++;
+				resetWriter();
+				return false;
+			}
+			else {
+				showOptions();
+			}
 		}
 		
 		if(keyCode == GLFW.GLFW_KEY_UP || keyCode == GLFW.GLFW_KEY_W)
@@ -156,6 +147,16 @@ public class DialogueScreen extends Screen
 		return super.keyPressed(keyCode, scanCode, i);
 	}
 	
+	private void showOptions() {
+		int xOffset = ((width - GUI_WIDTH) / 2) + PORTRAIT_SIZE + 16;
+		int yOffset = ((height - GUI_HEIGHT) / 2) + GUI_HEIGHT + 8;
+		
+		for (int i = 0; i < responseOptions.length; i++) {
+			addButton(new DialogueButton(xOffset, yOffset + (10 * i), GUI_WIDTH, 10, responseOptions[i], btn -> test()));
+		}
+		this.changeFocus(true);
+	}
+	
 	private int getAnimationOffset()
 	{
 		if(!this.doneWriting)
@@ -169,22 +170,6 @@ public class DialogueScreen extends Screen
 		doneWriting = false;
 		renderedText = "";
 		frame = 1;
-	}
-	
-	private void skip()
-	{
-		if(!doneWriting)
-		{
-			renderedText = dialogueText[currentTextIndex];
-			doneWriting = true;
-		} else if(currentTextIndex >= dialogueText.length - 1)
-		{
-			close();
-		} else
-		{
-			currentTextIndex++;
-			resetWriter();
-		}
 	}
 	
 	private void close()
@@ -217,7 +202,7 @@ public class DialogueScreen extends Screen
 			{
 				buttonText = "> " + buttonText;
 				color = playerTextColor;
-				offset = 0;
+				offset = 9;
 			}
 			
 			this.drawString(mc.fontRenderer, buttonText, this.x - offset, this.y, color);
