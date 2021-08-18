@@ -53,7 +53,7 @@ public class MinestuckConfig
 			echeladderAnimation = builder.comment("Allows control of standard speed for the echeladder rung \"animation\", or if it should have one in the first place.")
 					.defineEnum("echeladderAnimation", AnimationSpeed.NORMAL);
 			dialogueSpeed = builder.comment("Controls speed at which dialogue appears.")
-					.defineInRange("dialogueSpeed", 6, 1, Integer.MAX_VALUE);
+					.defineInRange("dialogueSpeed", 2, 1, Integer.MAX_VALUE);
 			builder.pop();
 		}
 	}

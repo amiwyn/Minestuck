@@ -5,6 +5,7 @@ import com.mraof.minestuck.MinestuckConfig;
 import com.mraof.minestuck.entity.consort.DialogueCard;
 import com.mraof.minestuck.network.DialogueOptionPacket;
 import com.mraof.minestuck.network.MSPacketHandler;
+import com.mraof.minestuck.util.Debug;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
@@ -69,11 +70,11 @@ public class DialogueScreen extends Screen
 	@Override
 	public void tick()
 	{
+		String text = dialogueCards.get(currentCardIndex).getText();
+		int amount = Math.min(frame * MinestuckConfig.CLIENT.dialogueSpeed.get(), text.length());
+		
 		if(!doneWriting)
 		{
-			String text = dialogueCards.get(currentCardIndex).getText();
-			int amount = Math.min(frame * MinestuckConfig.CLIENT.dialogueSpeed.get(), text.length());
-			
 			if(amount == text.length())
 			{
 				doneWriting = true;
@@ -82,10 +83,10 @@ public class DialogueScreen extends Screen
 					addOptions();
 				}
 			}
-			
-			renderedText = text.substring(0, amount);
-			frame++;
 		}
+		
+		renderedText = text.substring(0, amount);
+		frame++;
 	}
 	
 	@Override
@@ -152,10 +153,12 @@ public class DialogueScreen extends Screen
 	
 	private int getAnimationOffset()
 	{
+		Debug.debugf("not done writing = %s, frame = %s", !this.doneWriting, frame);
 		if(!this.doneWriting)
-			return (this.frame % 4) / 2;
-		
-		return 0;
+		{
+			return (this.frame % 32) / 4 + 9; //talking animation (second row of sprites) //TODO meant to show second row of sprites
+		}
+		return (this.frame % 32) / 4; //idle animation (first row of sprites)
 	}
 	
 	private void resetWriter()
