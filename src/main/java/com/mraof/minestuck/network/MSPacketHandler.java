@@ -63,6 +63,8 @@ public class MSPacketHandler
 		registerMessage(StoneTabletPacket.class, StoneTabletPacket::decode);
 		registerMessage(MagicEffectPacket.class, MagicEffectPacket::decode);
 		registerMessage(LotusFlowerPacket.class, LotusFlowerPacket::decode);
+		registerMessage(DialogueUpdatePacket.class, DialogueUpdatePacket::decode);
+		registerMessage(DialogueOptionPacket.class, DialogueOptionPacket::decode);
 		registerMessage(StopCreativeShockEffectPacket.class, StopCreativeShockEffectPacket::decode);
 	}
 	

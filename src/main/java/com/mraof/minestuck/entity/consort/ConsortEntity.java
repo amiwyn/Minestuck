@@ -25,7 +25,10 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.Explosion;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 import net.minecraft.world.*;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.FakePlayer;
@@ -48,9 +51,8 @@ public class ConsortEntity extends SimpleTexturedEntity implements IContainerPro
 	public EnumConsort.MerchantType merchantType = EnumConsort.MerchantType.NONE;
 	RegistryKey<World> homeDimension;
 	boolean visitedSkaia;
-	MessageType.DelayMessage updatingMessage; //TODO Change to an interface/array if more message components need tick updates
 	public ConsortMerchantInventory stocks;
-	private int eventTimer = -1;	//TODO use the interface mentioned in the todo above to implement consort explosion instead
+	private int eventTimer = -1;    //TODO use the interface mentioned in the todo above to implement consort explosion instead
 	
 	public ConsortEntity(EnumConsort consortType, EntityType<? extends ConsortEntity> type, World world)
 	{
@@ -111,9 +113,7 @@ public class ConsortEntity extends SimpleTexturedEntity implements IContainerPro
 				
 				try
 				{
-					ITextComponent text = message.getMessage(this, serverPlayer);
-					if(text != null)
-						player.sendMessage(text, Util.NIL_UUID);
+					message.showMessage(this, serverPlayer);
 					handleConsortRepFromTalking(serverPlayer);
 					MSCriteriaTriggers.CONSORT_TALK.trigger(serverPlayer, message.getString(), this);
 				} catch(Exception e)
@@ -139,7 +139,6 @@ public class ConsortEntity extends SimpleTexturedEntity implements IContainerPro
 	private void clearDialogueData()
 	{
 		messageData = null;
-		updatingMessage = null;
 		stocks = null;
 		talkRepPlayerList.clear();
 	}
@@ -156,10 +155,10 @@ public class ConsortEntity extends SimpleTexturedEntity implements IContainerPro
 	
 	protected void setExplosionTimer()
 	{
-		//Start a timer of one second: 20 ticks.
+		//Start a timer of two second: 40 ticks.
 		//Consorts explode when the timer hits zero.
 		if(eventTimer == -1)
-			eventTimer = 20;
+			eventTimer = 40;
 	}
 	
 	@Override
@@ -177,9 +176,6 @@ public class ConsortEntity extends SimpleTexturedEntity implements IContainerPro
 			if(message != null && !message.isLockedToConsort())
 				message = null;
 		}
-		
-		if(updatingMessage != null)
-			updatingMessage.onTickUpdate(this);
 		
 		if(MSDimensions.isSkaia(level.dimension()))
 			visitedSkaia = true;
@@ -336,14 +332,13 @@ public class ConsortEntity extends SimpleTexturedEntity implements IContainerPro
 		return consortType;
 	}
 	
-	public void commandReply(ServerPlayerEntity player, String chain)
+	public MessageType getMessage()
 	{
 		if(this.isAlive() && !level.isClientSide && message != null)
 		{
-			ITextComponent text = message.getFromChain(this, player, chain);
-			if(text != null)
-				player.sendMessage(text, Util.NIL_UUID);
+			return message.getMessage();
 		}
+		return null;
 	}
 	
 	public CompoundNBT getMessageTag()
