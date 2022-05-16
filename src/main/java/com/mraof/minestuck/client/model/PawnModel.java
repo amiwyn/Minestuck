@@ -6,7 +6,7 @@ import com.mraof.minestuck.entity.carapacian.PawnEntity;
 import net.minecraft.util.ResourceLocation;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 
-public class PawnModel extends AnimatedGeoModel<PawnEntity> {
+public class PawnModel extends AnimatedModel<PawnEntity> {
     @Override
     public ResourceLocation getModelLocation(PawnEntity object) {
         return new ResourceLocation(Minestuck.MOD_ID, "geo/entity/carapacian/pawn.geo.json");
