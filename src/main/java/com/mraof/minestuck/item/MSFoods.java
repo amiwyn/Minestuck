@@ -1,5 +1,6 @@
 package com.mraof.minestuck.item;
 
+import com.mraof.minestuck.effects.MSEffects;
 import net.minecraft.item.Food;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
@@ -67,5 +68,6 @@ public class MSFoods
     public static final Food FAYGO_MOON_MIST = (new Food.Builder()).nutrition(1).saturationMod(0.0F).alwaysEat().build();
     public static final Food FAYGO_PEACH = (new Food.Builder()).nutrition(1).saturationMod(0.0F).alwaysEat().build();
     public static final Food FAYGO_REDPOP = (new Food.Builder()).nutrition(1).saturationMod(0.0F).alwaysEat().build();
+    public static final Food SODA = (new Food.Builder()).nutrition(-1).saturationMod(0.0F).alwaysEat().effect(() -> new EffectInstance(MSEffects.ARTIFACTED.get(), 600, 0), 1).build();
     public static final Food GRUB_SAUCE = (new Food.Builder()).nutrition(1).saturationMod(0.1F).alwaysEat().build();
 }

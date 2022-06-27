@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ccc",
+    "c#c",
+    "ccc"
+  ],
+  "key": {
+    "#": {
+      "tag": "minestuck:faygo"
+    },
+    "c": {
+      "item": "minestuck:artifact_warhead"
+    }
+  },
+  "result": {
+    "item": "minestuck:soda"
+  }
+}

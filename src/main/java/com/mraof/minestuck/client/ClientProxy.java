@@ -55,7 +55,7 @@ public class ClientProxy
 		registerRenderers();
 		
 		MSScreenFactories.registerScreenFactories();
-
+		
 		RenderingRegistry.registerEntityRenderingHandler(MSEntityTypes.FROG, FrogRenderer::new);
 		RenderingRegistry.registerEntityRenderingHandler(MSEntityTypes.HOLOGRAM, HologramRenderer::new);
 		RenderingRegistry.registerEntityRenderingHandler(MSEntityTypes.LOTUS_FLOWER, LotusFlowerRenderer::new);
@@ -142,7 +142,7 @@ public class ClientProxy
 		ComputerProgram.registerProgramClass(1, SburbServer.class);
 		
 		registerArmorModels();
-
+		
 		IItemPropertyGetter content = (stack, world, holder) -> AlchemyHelper.hasDecodedItem(stack) ? 1 : 0;
 		ResourceLocation contentName = new ResourceLocation(Minestuck.MOD_ID, "content");
 		

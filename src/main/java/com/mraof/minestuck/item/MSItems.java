@@ -393,6 +393,7 @@ public class MSItems
 	public static final Item MOON_MIST_FAYGO = getNull();
 	public static final Item PEACH_FAYGO = getNull();
 	public static final Item REDPOP_FAYGO = getNull();
+	public static final Item SODA = getNull();
 	public static final Item GRUB_SAUCE = getNull();
 	public static final Item IRRADIATED_STEAK = getNull();
 	public static final Item SURPRISE_EMBRYO = getNull();
@@ -1243,6 +1244,7 @@ public class MSItems
 		registry.register(new DrinkableItem(new Item.Properties().stacksTo(16).tab(MSItemGroup.MAIN).food(MSFoods.FAYGO_MOON_MIST)).setRegistryName("moon_mist_faygo"));
 		registry.register(new DrinkableItem(new Item.Properties().stacksTo(16).tab(MSItemGroup.MAIN).food(MSFoods.FAYGO_PEACH)).setRegistryName("peach_faygo"));
 		registry.register(new DrinkableItem(new Item.Properties().stacksTo(16).tab(MSItemGroup.MAIN).food(MSFoods.FAYGO_REDPOP)).setRegistryName("redpop_faygo"));
+		registry.register(new DrinkableItem(new Item.Properties().stacksTo(1).tab(MSItemGroup.MAIN).food(MSFoods.SODA)).setRegistryName("soda"));
 		registry.register(new DrinkableItem(new Item.Properties().stacksTo(16).tab(MSItemGroup.LANDS).food(MSFoods.GRUB_SAUCE)).setRegistryName("grub_sauce"));
 		registry.register(new Item(new Item.Properties().tab(MSItemGroup.MAIN).food(MSFoods.IRRADIATED_STEAK)).setRegistryName("irradiated_steak"));
 		registry.register(new SurpriseEmbryoItem(new Item.Properties().tab(MSItemGroup.MAIN).food(MSFoods.SURPRISE_EMBRYO)).setRegistryName("surprise_embryo"));
