@@ -999,6 +999,8 @@ public class MinestuckEnUsLanguageProvider extends MinestuckLanguageProvider
 		add(MSItems.MOON_MIST_FAYGO, "Moonmist Faygo");
 		add(MSItems.PEACH_FAYGO, "Peach Faygo");
 		add(MSItems.REDPOP_FAYGO, "Redpop Faygo");
+		add(MSItems.SODA, "SODA!!!!!");
+		addTooltip(MSItems.SODA, "This container has materialized its own warning regarding its contents stating: 'Warning: This product may contain higher levels of FUN!1!! than is rated for consumption by organic life'");
 		add(MSItems.GRUB_SAUCE, "Grub Sauce");
 		add(MSItems.IRRADIATED_STEAK, "Irradiated Steak");
 		addTooltip(MSItems.IRRADIATED_STEAK, "Steak (over)cooked using the power of uranium!");

@@ -7,6 +7,7 @@ import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderArmEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
@@ -34,7 +35,8 @@ public class ArtifactEffectRenderer extends PlayerRenderer
 			return;
 		skipEvent = true;
 		
-		
+		//TODO eventually get the potion effect to work on the player decoy during edit mode
+		//TODO render does not work well with our custom modeled armor, textures only show for certain bones(potentially only those that are directly tied to bones existing in base model) and its inconsistent between the inventory screen render and 3rd person render
 		event.setCanceled(true);
 		this.render((AbstractClientPlayerEntity) event.getPlayer(), event.getPlayer().getYHeadRot(), event.getPartialRenderTick(), event.getMatrixStack(), event.getBuffers(), event.getLight());
 		skipEvent = false;
@@ -60,7 +62,10 @@ public class ArtifactEffectRenderer extends PlayerRenderer
 		
 		TexturedClientPlayerEntity player = new TexturedClientPlayerEntity((ClientWorld) event.getPlayer().level, event.getPlayer().getGameProfile());
 		event.setCanceled(true);
-		this.renderRightHand(event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight(), player);
+		if(event.getArm() == HandSide.RIGHT)
+			this.renderRightHand(event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight(), player);
+		else
+			this.renderLeftHand(event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight(), player);
 		skipEvent = false;
 	}
 	
