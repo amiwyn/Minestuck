@@ -86,6 +86,7 @@ public class ClientProxy
 		EntityRenderers.register(MSEntityTypes.MIDNIGHT_CREW_POSTER.get(), manager -> new RenderHangingArt<>(manager, new ResourceLocation("minestuck:midnight_poster")));
 		EntityRenderers.register(MSEntityTypes.SBAHJ_POSTER.get(), manager -> new RenderHangingArt<>(manager, new ResourceLocation("minestuck:sbahj_poster")));
 		EntityRenderers.register(MSEntityTypes.SHOP_POSTER.get(), manager -> new RenderHangingArt<>(manager, new ResourceLocation("minestuck:shop_poster")));
+		EntityRenderers.register(MSEntityTypes.METEOR.get(), MeteorRenderer::new);
 		
 		ItemBlockRenderTypes.setRenderLayer(MSBlocks.PUNCH_DESIGNIX.SLOT.get(), RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(MSBlocks.ALCHEMITER.TOTEM_PAD.get(), RenderType.cutout());

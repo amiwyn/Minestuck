@@ -59,6 +59,8 @@ public final class MSEntityTypes
 	public static final RegistryObject<EntityType<ReturningProjectileEntity>> RETURNING_PROJECTILE = REGISTER.register("returning_projectile", () -> EntityType.Builder.<ReturningProjectileEntity>of(ReturningProjectileEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).setTrackingRange(6).setUpdateInterval(2).fireImmune().build(new ResourceLocation(Minestuck.MOD_ID, "returning_projectile").toString())); //TODO smaller update interval value is temporary solution to improve client rendering
 	public static final RegistryObject<EntityType<BouncingProjectileEntity>> BOUNCING_PROJECTILE = REGISTER.register("bouncing_projectile", () -> EntityType.Builder.<BouncingProjectileEntity>of(BouncingProjectileEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).setTrackingRange(6).setUpdateInterval(2).fireImmune().build(new ResourceLocation(Minestuck.MOD_ID, "bouncing_projectile").toString()));
 	
+	public static final RegistryObject<EntityType<MeteorEntity>> METEOR = REGISTER.register("meteor", () -> EntityType.Builder.<MeteorEntity>of(MeteorEntity::new, MobCategory.MISC).sized(1F, 1F).setTrackingRange(4).setUpdateInterval(10).fireImmune().build(new ResourceLocation(Minestuck.MOD_ID, "meteor").toString()));
+	
 	/**
 	 * Currently (1.15), this is not thread safe and need to be deferred
 	 */

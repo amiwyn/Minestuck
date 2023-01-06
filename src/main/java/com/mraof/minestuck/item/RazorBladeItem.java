@@ -1,9 +1,12 @@
 package com.mraof.minestuck.item;
 
+import com.mraof.minestuck.entity.MeteorEntity;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -66,5 +69,18 @@ public class RazorBladeItem extends Item
 			}
 		}
 		return super.mineBlock(stack, level, state, pos, entityLiving);
+	}
+	
+	@Override
+	public InteractionResultHolder<ItemStack> use(Level level, Player playerIn, InteractionHand handIn)
+	{
+		if(!level.isClientSide)
+		{
+			MeteorEntity meteor = new MeteorEntity(level, playerIn.position());
+			meteor.shootFromRotation(playerIn, playerIn.getXRot(), playerIn.getYRot(), 0.0F, 0.05F, 1.0F);
+			level.addFreshEntity(meteor);
+		}
+		
+		return super.use(level, playerIn, handIn);
 	}
 }
