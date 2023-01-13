@@ -32,6 +32,9 @@ public class MeteorRenderer extends GeoProjectilesRenderer<MeteorEntity>
 	{
 		stackIn.translate(0.3, -0.5, 0);
 		stackIn.mulPose(Vector3f.YP.rotationDegrees(-90));
+		
+		float size = animatable.getSize() * 0.3f;
+		stackIn.scale(size, size, size);
 		super.renderEarly(animatable, stackIn, partialTicks, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 	
@@ -41,14 +44,6 @@ public class MeteorRenderer extends GeoProjectilesRenderer<MeteorEntity>
 		int frame = (int) (meteor.getLevel().getGameTime() % frameCount);
 		
 		matrixStackIn.pushPose();
-//		Vec3 origin = new Vec3(-1, 0, 0);
-//		Vec3 direction = meteor.getDeltaMovement().normalize();
-//		float angle = (float) (1 + direction.dot(origin));
-//		Vec3 rotationAxis = direction.cross(origin);
-//		Quaternion rotation = new Quaternion((float) rotationAxis.x, (float) rotationAxis.y, (float) rotationAxis.z, -angle);
-//		rotation.normalize();
-//		matrixStackIn.mulPose(rotation);
-		
 		Vec3 direction = meteor.getDeltaMovement().normalize();
 		float yaw = (float) Math.atan2(-direction.z, -direction.x);
 		float pitch = (float) Math.acos(Vector3f.YP.dot(new Vector3f(direction)));
@@ -64,15 +59,22 @@ public class MeteorRenderer extends GeoProjectilesRenderer<MeteorEntity>
 	
 	private void renderSideFlamesTexture(MeteorEntity meteor, PoseStack stack, MultiBufferSource buffer, int light, int frame)
 	{
-		stack.pushPose();
-		Vec3 direction = meteor.getDeltaMovement();
-		Vec3 cameraPos = entityRenderDispatcher.camera.getPosition();
-
-		float side2 = Math.signum(entityRenderDispatcher.camera.getYRot());
-		float side3 = (float) Math.signum(direction.x * (cameraPos.z - meteor.position().z) - direction.z * (cameraPos.x - meteor.position().x));
-		stack.mulPose(Vector3f.XP.rotationDegrees(side2 * -side3 * entityRenderDispatcher.camera.getXRot()));
+		Vec3 direction = meteor.getDeltaMovement().normalize();
+		Vec3 look = new Vec3(entityRenderDispatcher.camera.getLookVector()).normalize();
+		float cameraAngle = (float) Math.toDegrees(Math.acos(direction.dot(look)));
 		
-		stack.scale(3, 3, 3);
+		if(cameraAngle < 20 || cameraAngle > 160) {
+			return;
+		}
+		
+		stack.pushPose();
+		Vec3 cameraPos = entityRenderDispatcher.camera.getPosition();
+		float rotation = Math.signum(entityRenderDispatcher.camera.getYRot());
+		float side = (float) Math.signum(direction.x * (cameraPos.z - meteor.position().z) - direction.z * (cameraPos.x - meteor.position().x));
+		stack.mulPose(Vector3f.XP.rotationDegrees(side * entityRenderDispatcher.camera.getXRot()));
+		
+		float size = meteor.getSize();
+		stack.scale(size, size, size);
 		
 		final float height = 48f / textureSize;
 		final float width = 128f / textureSize;
@@ -84,22 +86,31 @@ public class MeteorRenderer extends GeoProjectilesRenderer<MeteorEntity>
 		Matrix3f normals = pose.normal();
 		
 		VertexConsumer consumer = buffer.getBuffer(RenderType.entityCutoutNoCull(MeteorModel.Texture));
-		consumer.vertex(pos, -0.4F, -0.5F, 0.0F).color(255, 255, 255, 255).uv(start.x, start.y + height + uPos)
+		consumer.vertex(pos, -0.4F, -0.4F, 0.0F).color(255, 255, 255, 255).uv(start.x, start.y + height + uPos)
 				.overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normals, 0.0F, 1.0F, 0.0F).endVertex();
-		consumer.vertex(pos, 2.2666F, -0.5F, 0.0F).color(255, 255, 255, 255).uv(start.x + width, start.y + height + uPos)
+		consumer.vertex(pos, 2.2666F, -0.4F, 0.0F).color(255, 255, 255, 255).uv(start.x + width, start.y + height + uPos)
 				.overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normals, 0.0F, 1.0F, 0.0F).endVertex();
-		consumer.vertex(pos, 2.2666F, 0.5F, 0.0F).color(255, 255, 255, 255).uv(start.x + width, start.y + uPos)
+		consumer.vertex(pos, 2.2666F, 0.6F, 0.0F).color(255, 255, 255, 255).uv(start.x + width, start.y + uPos)
 				.overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normals, 0.0F, 1.0F, 0.0F).endVertex();
-		consumer.vertex(pos, -0.4F, 0.5F, 0.0F).color(255, 255, 255, 255).uv(start.x, start.y + uPos)
+		consumer.vertex(pos, -0.4F, 0.6F, 0.0F).color(255, 255, 255, 255).uv(start.x, start.y + uPos)
 				.overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normals, 0.0F, 1.0F, 0.0F).endVertex();
 		stack.popPose();
 	}
 	
 	private void renderFrontFlamesTexture(MeteorEntity meteor, PoseStack stack, MultiBufferSource buffer, int light, int frame)
 	{
+		Vec3 direction = meteor.getDeltaMovement().normalize();
+		Vec3 look = new Vec3(entityRenderDispatcher.camera.getLookVector()).normalize();
+		float cameraAngle = (float) Math.toDegrees(Math.acos(direction.dot(look)));
+		
+		if(cameraAngle > 30 && cameraAngle < 150) {
+			return;
+		}
+		
 		stack.pushPose();
 		stack.mulPose(Vector3f.YP.rotationDegrees(90));
-		stack.scale(2.5f, 2.5f, 2.5f);
+		float size = meteor.getSize() * 0.8f;
+		stack.scale(size, size, size);
 		
 		final float height = 48f / textureSize;
 		final float width = 48f / textureSize;
@@ -111,13 +122,13 @@ public class MeteorRenderer extends GeoProjectilesRenderer<MeteorEntity>
 		Matrix3f normals = pose.normal();
 		
 		VertexConsumer consumer = buffer.getBuffer(RenderType.entityCutoutNoCull(MeteorModel.Texture));
-		consumer.vertex(pos, -0.5F, -0.5F, 0.0F).color(255, 255, 255, 255).uv(start.x, start.y + height + uPos)
+		consumer.vertex(pos, -0.5F, -0.4F, 0.0F).color(255, 255, 255, 255).uv(start.x, start.y + height + uPos)
 				.overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normals, 0.0F, 1.0F, 0.0F).endVertex();
-		consumer.vertex(pos, 0.5F, -0.5F, 0.0F).color(255, 255, 255, 255).uv(start.x + width, start.y + height + uPos)
+		consumer.vertex(pos, 0.5F, -0.4F, 0.0F).color(255, 255, 255, 255).uv(start.x + width, start.y + height + uPos)
 				.overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normals, 0.0F, 1.0F, 0.0F).endVertex();
-		consumer.vertex(pos, 0.5F, 0.5F, 0.0F).color(255, 255, 255, 255).uv(start.x + width, start.y + uPos)
+		consumer.vertex(pos, 0.5F, 0.6F, 0.0F).color(255, 255, 255, 255).uv(start.x + width, start.y + uPos)
 				.overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normals, 0.0F, 1.0F, 0.0F).endVertex();
-		consumer.vertex(pos, -0.5F, 0.5F, 0.0F).color(255, 255, 255, 255).uv(start.x, start.y + uPos)
+		consumer.vertex(pos, -0.5F, 0.6F, 0.0F).color(255, 255, 255, 255).uv(start.x, start.y + uPos)
 				.overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normals, 0.0F, 1.0F, 0.0F).endVertex();
 		stack.popPose();
 	}

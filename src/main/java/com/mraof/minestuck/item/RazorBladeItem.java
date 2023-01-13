@@ -16,6 +16,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Random;
+
 public class RazorBladeItem extends Item
 {
 	
@@ -76,8 +78,9 @@ public class RazorBladeItem extends Item
 	{
 		if(!level.isClientSide)
 		{
-			MeteorEntity meteor = new MeteorEntity(level, playerIn.position());
-			meteor.shootFromRotation(playerIn, playerIn.getXRot(), playerIn.getYRot(), 0.0F, 0.05F, 1.0F);
+			Random rdn = new Random();
+			MeteorEntity meteor = new MeteorEntity(level, playerIn.position(), rdn.nextInt(12) + 1);
+			meteor.shootFromRotation(playerIn, playerIn.getXRot(), playerIn.getYRot(), 0.0F, 0.1F, 1.0F);
 			level.addFreshEntity(meteor);
 		}
 		
